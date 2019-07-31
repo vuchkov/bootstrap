@@ -1,7 +1,13 @@
-{{ if eq (getenv "HUGO_ENV") "production" -}}
-  <script src="/docs/{{ .Site.Params.docs_version }}/dist/js/bootstrap.bundle.min.js" integrity="{{ .Site.Params.cdn.js_bundle_hash }}" crossorigin="anonymous"></script>
-{{ else -}}
-  <script src="/docs/{{ .Site.Params.docs_version }}/dist/js/bootstrap.bundle.js"></script>
+{{- $js_filename := "bootstrap.bundle.js" -}}
+
+{{- if eq (getenv "HUGO_ENV") "production" -}}
+{{- $js_filename = "bootstrap.bundle.min.js" -}}
+{{- end -}}
+
+{{- $js := resources.Get (printf "dist/js/%s" $js_filename) -}}
+
+{{- with $js }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ ($js | fingerprint "sha384").Data.Integrity }}" crossorigin="anonymous"></script>
 {{- end }}
 
 {{ if (or (eq .Page.Layout "docs") (eq .Page.Layout "single")) -}}
